@@ -1,21 +1,12 @@
-from fastapi import FastAPI, Body, Response, status,HTTPException,Depends
+from fastapi import FastAPI, Body, Response, status,HTTPException
 from pydantic import BaseModel,Field
 from typing import Optional,Annotated
 from random import randrange
 import psycopg2
 import time
-from sqlalchemy.orm import Session
-from . import models
-from .database import engine,get_db,Base
 #this will give column name as well as value 
 from psycopg2.extras import RealDictCursor 
 app= FastAPI()
-
-#this line is writtent to initilaise the model 
-#models.Base.metadata.create_all(bind=engine)
-#this is the correct form
-models.Base.metadata.create_all(bind=engine)
-
 
 
 #this is the connection string to the database 
@@ -32,19 +23,14 @@ while True:
 
 
 
-
-class Post(BaseModel):
-    published:bool=True
+class PostUpdate(BaseModel):
     title:str
     content:str
+class Post(PostUpdate):
+    published:bool=True
     
 
 my_posts=[{"title":"Dog","cotent":"Dog eating banana","rating":5,"id":1},{"title":"Cat","cotent":"Cat eating biscuits","rating":5,"id":2}]
-
-
-@app.get("/sql")
-async def get_post(db:Session=Depends(get_db)):
-    return {"status":"suzzes"}
 
 @app.get("/post")
 
