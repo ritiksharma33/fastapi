@@ -109,13 +109,13 @@ async def delete_post(id:int,status_code=status.HTTP_204_NO_CONTENT):
 # this is data coming from frontedn we convert it to the dictnary we give it id as we give after the same as that data not contanin the id  
 @app.put("/post/{id}")
 async def update_post(id:int,post:Post):
-    index=find_index_post(id)
-    if index is None:
+    cursor.execute(""" UPDATE posts SET title=%s,content=%s, published=%s WHERE id=%s RETURNING *""",(post.title,post.content,post.published,(id,)))
+    updated_post=cursor.fetchone()
+    conn.commit()
+    if updated_post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id {id} not exist"
         )
-    post_dict=post.dict()
-    post_dict['id']=id
-    my_posts[index]=post_dict
-    return {"data":post_dict}
+    
+    return {"data":updated_post}
